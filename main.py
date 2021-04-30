@@ -1,12 +1,12 @@
 class Vector:
-    def __init__(self):
-        self.coordinates = (0, 0)  # the vector itself
-        self.clust = Cluster()  # the cluster who's the vector belong to
+    def __init__(self, arr):
+        self.coordinates = arr  # the vector itself
+        self.clust = None  # the cluster who's the vector belong to
 
     def getCluster(self):
         return self.clust
 
-    def getcoordinates(self):
+    def getCoordinates(self):
         return self.coordinates
 
 
@@ -19,13 +19,15 @@ class Cluster:
 
     def addVector(self, vector):
         for i in range(0, self.d):
-            self.sum[i] += vector.getCoordinates[i]
+            self.sum[i] += vector.getCoordinates()[i]
         self.count += 1
+        vector.clust = self
 
     def deleteVector(self, vector):
         for i in range(0, self.d):
-            self.sum[i] -= vector.getCoordinates[i]
+            self.sum[i] -= vector.getCoordinates()[i]
         self.count -= 1
+        vector.clust = None
 
     def getMean(self):
         return self.mean
@@ -46,7 +48,7 @@ def distance(x, y):
         return None
     sum = 0
     for i in range(0, len(x)):
-        sum += (x[i]-y[i])**2
+        sum += (x[i] - y[i]) ** 2
     return sum
 
 
@@ -61,7 +63,7 @@ def findCluster(vector):
     mean = clustersArr[0].getMean()
     minDistance = distance(vector, mean)
     tempDistance = 0
-    minCluster = clustersArr[0]  #default
+    minCluster = clustersArr[0]  # default
     for clust in clustersArr:
         mean = clust.getMean()
         tempDistance = distance(vector.getCoordinates(), mean)
@@ -71,3 +73,16 @@ def findCluster(vector):
 
     vector.getCluster().deleteVector(vector)
     minCluster.addVector(vector)
+
+
+# # test
+# c1 = [2, 2]
+# c2 = [2, 8]
+# print(36 == distance(c1, c2))
+#
+# vec1 = Vector(c1)
+# vec2 = Vector(c2)
+# clust = Cluster(2)
+# clust.addVector(vec1)
+# clust.addVector(vec2)
+# clust.deleteVector(vec1)
