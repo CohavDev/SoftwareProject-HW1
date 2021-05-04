@@ -95,15 +95,27 @@ def findCluster(vector):
 # clust.addVector(vec2)
 # clust.deleteVector(vec1)
 
-def initFromFile(fileName):
+def initFromFile(fileName, k, d):
     # TODO: read vectors from file and init arrays
-    x = 5
+    f = open(fileName, "rt")
+    for line in f:
+        vec = Vector(line.split(","))
+        vectorsArr.append(vec)
+    f.close()
+    # set first k vectors as centroids
+    for i in range(0, k):
+        vec = vectorsArr[i]
+        clust = Cluster(d)
+        clust.addVector(vec)
+        clustersArr.append(clust)
 
 
-def printMeans():
-    #TODO: printing array should be done be me?
-    for clust in clustersArr:
-        print(clust.getMean())
+def printMeans(lst):
+    for clust in lst:
+        arr = clust.getMean()
+        for x in arr:
+            print(x + ",")
+        print("\n")
 
 
 # TODO: didnt check this function
@@ -117,4 +129,4 @@ def kMeans(k, maxIter, fileName):
             findCluster(vec)
         # recalcs means of clusters, and determines if changed
         changed = reCalcMeans()
-    printMeans()
+    printMeans(clustersArr)
