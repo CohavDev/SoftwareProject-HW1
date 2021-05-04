@@ -1,3 +1,6 @@
+import sys
+
+
 class Vector:
     def __init__(self, arr):
         self.coordinates = arr  # the vector itself
@@ -69,9 +72,8 @@ def reCalcMeans():
 # insert vector to its closest cluster and removes it from the previous
 def findCluster(vector):
     mean = clustersArr[0].getMean()
-    minDistance = distance(vector, mean)
-    tempDistance = 0
-    minCluster = clustersArr[0]  # default
+    minDistance = distance(vector.getCoordinates(), mean)
+    minCluster = clustersArr[0]
     for clust in clustersArr:
         mean = clust.getMean()
         tempDistance = distance(vector.getCoordinates(), mean)
@@ -79,7 +81,8 @@ def findCluster(vector):
             minDistance = tempDistance
             minCluster = clust
 
-    vector.getCluster().deleteVector(vector)
+    if vector.getCluster() is not None:
+        vector.getCluster().deleteVector(vector)
     minCluster.addVector(vector)
 
 
@@ -95,32 +98,39 @@ def findCluster(vector):
 # clust.addVector(vec2)
 # clust.deleteVector(vec1)
 
-def initFromFile(fileName, k, d):
-    # TODO: read vectors from file and init arrays
-    f = open(fileName, "rt")
-    for line in f:
-        vec = Vector(line.split(","))
+def initFromFile(k):
+    # TODO: change how file is recieved
+    # f = open(fileName)
+    # for line in f:
+    for line in sys.stdin:
+        lstStr = line.split(",")
+        vec = Vector(list(map(float, lstStr)))
         vectorsArr.append(vec)
-    f.close()
+    # close file
+    sys.stdin.close()
+    # length of vector
+    d = len(vectorsArr[0].getCoordinates())
     # set first k vectors as centroids
     for i in range(0, k):
         vec = vectorsArr[i]
         clust = Cluster(d)
         clust.addVector(vec)
         clustersArr.append(clust)
+        clust.calcMean()
 
 
 def printMeans(lst):
     for clust in lst:
         arr = clust.getMean()
-        for x in arr:
-            print(x + ",")
-        print("\n")
+        for i in range(0,len(arr)-1):
+            print('%.4f' % arr[i],",", end="")
+        print('%.4f' % arr[-1], end="")
+        print("")
 
 
 # TODO: didnt check this function
-def kMeans(k, maxIter, fileName):
-    initFromFile(fileName)
+def kMeans(k, maxIter=200):
+    initFromFile(k)
     changed = True  # false if cluster's mean have converged
     iterCount = 0  # counts number of iterations
     while (iterCount < maxIter) and changed:
@@ -130,3 +140,10 @@ def kMeans(k, maxIter, fileName):
         # recalcs means of clusters, and determines if changed
         changed = reCalcMeans()
     printMeans(clustersArr)
+
+
+# program run starts here
+if len(sys.argv) == 3:
+    kMeans(int(sys.argv[1]), int(sys.argv[2]))
+if len(sys.argv) == 2:
+    kMeans(int(sys.argv[1]))
