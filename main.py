@@ -33,8 +33,12 @@ class Cluster:
         return self.mean
 
     def calcMean(self):
+        changed = False  # indicates if mean have changed
         for i in range(0, self.d):
+            if self.mean[i] != self.sum[i] / self.count:
+                changed = True
             self.mean[i] = self.sum[i] / self.count
+        return changed
 
 
 # main
@@ -52,10 +56,14 @@ def distance(x, y):
     return sum
 
 
-# calc means of each cluster in the array of clusters
+# calc means of each cluster in the array of clusters.
+# returns True if means have changed, False otherwise.
 def reCalcMeans():
+    changed = False
     for clust in clustersArr:
-        clust.calcMean()
+        if clust.calcMean():
+            changed = True
+    return changed
 
 
 # insert vector to its closest cluster and removes it from the previous
@@ -75,7 +83,7 @@ def findCluster(vector):
     minCluster.addVector(vector)
 
 
-# # test
+# test
 # c1 = [2, 2]
 # c2 = [2, 8]
 # print(36 == distance(c1, c2))
@@ -86,3 +94,39 @@ def findCluster(vector):
 # clust.addVector(vec1)
 # clust.addVector(vec2)
 # clust.deleteVector(vec1)
+
+def initFromFile(fileName, k, d):
+    # TODO: read vectors from file and init arrays
+    f = open(fileName, "rt")
+    for line in f:
+        vec = Vector(line.split(","))
+        vectorsArr.append(vec)
+    f.close()
+    # set first k vectors as centroids
+    for i in range(0, k):
+        vec = vectorsArr[i]
+        clust = Cluster(d)
+        clust.addVector(vec)
+        clustersArr.append(clust)
+
+
+def printMeans(lst):
+    for clust in lst:
+        arr = clust.getMean()
+        for x in arr:
+            print(x + ",")
+        print("\n")
+
+
+# TODO: didnt check this function
+def kMeans(k, maxIter, fileName):
+    initFromFile(fileName)
+    changed = True  # false if cluster's mean have converged
+    iterCount = 0  # counts number of iterations
+    while (iterCount < maxIter) and changed:
+        iterCount += 1
+        for vec in vectorsArr:
+            findCluster(vec)
+        # recalcs means of clusters, and determines if changed
+        changed = reCalcMeans()
+    printMeans(clustersArr)
