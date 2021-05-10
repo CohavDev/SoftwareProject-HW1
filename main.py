@@ -4,10 +4,10 @@ import sys
 class Vector:
     def __init__(self, arr):
         self.coordinates = arr  # the vector itself
-        self.clust = None  # the cluster who's the vector belong to
+        # self.clust = None  # the cluster who's the vector belong to
 
-    def getCluster(self):
-        return self.clust
+    # def getCluster(self):
+    #     return self.clust
 
     def getCoordinates(self):
         return self.coordinates
@@ -24,13 +24,13 @@ class Cluster:
         for i in range(0, self.d):
             self.sum[i] += vector.getCoordinates()[i]
         self.count += 1
-        vector.clust = self
+        # vector.clust = self
 
     def deleteVector(self, vector):
         for i in range(0, self.d):
             self.sum[i] -= vector.getCoordinates()[i]
         self.count -= 1
-        vector.clust = None
+        # vector.clust = None
 
     def getMean(self):
         return self.mean
@@ -81,9 +81,15 @@ def findCluster(vector):
             minDistance = tempDistance
             minCluster = clust
 
-    if vector.getCluster() is not None:
-        vector.getCluster().deleteVector(vector)
+    # if vector.getCluster() is not None:
+    #     vector.getCluster().deleteVector(vector)
     minCluster.addVector(vector)
+
+
+def refreshClusters():
+    for clust in clustersArr:
+        clust.sum = [0] * clust.d
+        clust.count = 0
 
 
 # test
@@ -117,6 +123,7 @@ def initFromFile(k):
         clust.addVector(vec)
         clustersArr.append(clust)
         clust.calcMean()
+        refreshClusters()
 
 
 def printMeans(lst):
@@ -139,6 +146,7 @@ def kMeans(k, maxIter=200):
             findCluster(vec)
         # recalcs means of clusters, and determines if changed
         changed = reCalcMeans()
+        refreshClusters()
     printMeans(clustersArr)
 
 
